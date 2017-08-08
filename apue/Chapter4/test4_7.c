@@ -5,6 +5,7 @@
     > Created Time: Tue 08 Aug 2017 10:27:52 AM CST
  ************************************************************************/
 
+/*  the instance of function access  */
 #include <apue.h>
 #include <fcntl.h>
 
