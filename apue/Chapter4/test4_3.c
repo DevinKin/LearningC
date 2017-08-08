@@ -7,6 +7,7 @@
 
 #include "apue.h"
 
+/*  Print the file type  */
 int
 main(int argc, char *argv[])
 {
