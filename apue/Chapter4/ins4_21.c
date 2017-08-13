@@ -16,7 +16,7 @@ main(int argc, char *argv[])
 	struct	stat	statbuf;
 	struct	timespec	times[2];
 	if (argc < 2)
-		err_ret("Usage: ./ins4_21 <filename>");
+		err_quit("Usage: ./ins4_21 <filename>");
 	for (i = 1; i < argc; i++)
 	{
 		if (stat(argv[i],&statbuf) < 0)		/*  fetch current times  */
