@@ -14,7 +14,7 @@ main(void)
 {
 	char	*ptr;
 	size_t	size;
-	if (chdir("/home/king/LearningC/apue/Chapter4/testdir") < 0)
+	if (chdir("/home/king/LearningC/apue/Chapter4/testdir/spool/uucppublic") < 0)
 		err_sys("chdir failed");
 
 	ptr = path_alloc(&size);			/*  our own function  */
