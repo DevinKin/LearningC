@@ -115,6 +115,7 @@ dopath(Myfunc *func)
 	if (n + NAME_MAX + 2 > pathlen)			/* expand path buffer */
 	{
 		pathlen *= 2;
+		printf("realloc\n");
 		if ((filename = realloc(filename, pathlen)) == NULL)
 			err_sys("realoc failed");
 	}
