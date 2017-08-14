@@ -14,7 +14,9 @@
 #include "apue.h"
 #include <dirent.h>
 #include <limits.h>
+#include <unistd.h>
 #include <time.h>
+
 
 
 /*  function type that is called for each filename  */
@@ -29,9 +31,9 @@ int
 main(int argc, char *argv[])
 {
 	double	whole;
-	clock_t	start,finish;
+	clock_t	str,end;
 	int		ret;
-	start = clock();
+	str = clock();
 	if (argc != 2)
 		err_quit("usage: ftw <starting-pathname>");
 	ret = myftw(argv[1], myfunc);
@@ -52,9 +54,9 @@ main(int argc, char *argv[])
 			nslink * 100.0 / ntot);
 	printf("sockets		= %7ld, %5.2f %%\n", nsock,
 			nsock * 100.0 / ntot);
-	finish = clock();
-	whole = (double)(finish - start) / CLOCKS_PER_SEC;
-	printf("ins4_22 cost : %f second\n", whole);
+	end = clock();
+	whole = (double)(end - str) / CLOCKS_PER_SEC;
+	printf("test4_11 costs : %f second\n", whole);
 	exit(ret);
 }
 
@@ -67,26 +69,26 @@ main(int argc, char *argv[])
 #define		FTW_DNR	3				/*  directory that can't be read  */
 #define		FTW_NS	4				/*  file that we can't stat  */
 
-static	char * fullpath;			/*  contains full pathname for every file  */
+static	char * filename;			/*  contains full pathname for every file  */
 static	size_t pathlen;
 static int			/*  we return whatever func() returns  */
 myftw(char *pathname, Myfunc *func)
 {
-	fullpath = path_alloc(&pathlen);		/*  malloc PATH_MAX+1 bytes  */
+	filename = path_alloc(&pathlen);		/*  malloc PATH_MAX+1 bytes  */
 											/*  ({Flgure 2.16})  */
 	if (pathlen <= strlen(pathname))
 	{
 		pathlen = strlen(pathname) * 2;
-		if ((fullpath = realloc(fullpath, pathlen)) == NULL)
+		if ((filename = realloc(filename, pathlen)) == NULL)
 			err_sys("realloc failed");
 	}
-	strcpy(fullpath, pathname);
+	strcpy(filename, pathname);
 	return(dopath(func));
 }
 
 /*
- * Descend through the hirearchy, starting at "fullpath".
- * If "fullpath" is anything other than a directory, we lstat() it,
+ * Descend through the hirearchy, starting at "filename".
+ * If "filename" is anything other than a directory, we lstat() it,
  * call func(), and return, For a directory, we call ourself
  * recursively for each name in the directory.
  */
@@ -98,40 +100,43 @@ dopath(Myfunc *func)
 	struct	dirent	*dirp;
 	DIR		*dp;
 	int		ret, n;
-	if (lstat(fullpath, &statbuf) < 0)	/*  stat error  */
-		return (func(fullpath,&statbuf, FTW_NS));
+	if (lstat(filename, &statbuf) < 0)	/*  stat error  */
+		return (func(filename,&statbuf, FTW_NS));
 	if (S_ISDIR(statbuf.st_mode) == 0)		/*  not a directory  */
-		return (func(fullpath, &statbuf, FTW_F));
+		return (func(filename, &statbuf, FTW_F));
 
 	/*
 	 * It's a directory, First call func() for the directory,
 	 * then process each filename in the directory.
 	 */
-	if ((ret = func(fullpath, &statbuf, FTW_D)) != 0)
+	if ((ret = func(filename, &statbuf, FTW_D)) != 0)
 		return(ret);
-	n = strlen(fullpath);
+	n = strlen(filename);
 	if (n + NAME_MAX + 2 > pathlen)			/* expand path buffer */
 	{
 		pathlen *= 2;
-		if ((fullpath = realloc(fullpath, pathlen)) == NULL)
+		if ((filename = realloc(filename, pathlen)) == NULL)
 			err_sys("realoc failed");
 	}
-	fullpath[n++] = '/';
-	fullpath[n] = 0;
-	if ((dp = opendir(fullpath)) == NULL)		/*  can't read directory  */
-		return(func(fullpath, &statbuf, FTW_DNR));
+	if ((dp = opendir(filename)) == NULL)		/*  can't read directory  */
+		return(func(filename, &statbuf, FTW_DNR));
+	if (chdir(filename) < 0)
+		err_sys("chdir %s error", filename);
 	while ((dirp = readdir(dp)) != NULL)
 	{
 		if (strcmp(dirp->d_name, ".") == 0 ||
 				strcmp(dirp->d_name, "..") == 0)
 			continue;				/*  ignore dot and dot-dot  */
-		strcpy(&fullpath[n], dirp->d_name);
+		filename = dirp->d_name;
 		if ((ret = dopath(func)) != 0)		/*  recursive  */
+		{
 			break;				/*  time to leave  */
+		}
 	}
-	fullpath[n - 1] = 0;		/* erase everything from slash onward  */
+	if (chdir("..") < 0)
+		err_sys("chdir .. error");
 	if (closedir(dp) < 0)
-		err_ret("can't close directory %s", fullpath);
+		err_ret("can't close directory %s", filename);
 	return(ret);
 }
 
