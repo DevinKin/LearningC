@@ -45,8 +45,8 @@ sll_insert(Node *current, int new_value)
 	/*
 	 * 把新节点插入到链表中，并返回TRUE
 	 */
-	new->link = current;
-	previous->link = new;
+	newN->link = current;
+	previous->link = newN;
 	return TRUE;
 }
 
