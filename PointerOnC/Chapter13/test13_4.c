@@ -21,15 +21,8 @@ swap(char *i, char *j, int elesize)
 int 
 comp(char *i, char *j)
 {
-	int		result = 0;
-	if (*i > *j)
-		result = 1;
-	else if( *i < *j) 
-		result = -1;
-	else
-		result = 0;
-
-	return result;
+	return *i > *j ? 1 : 
+		*i < *j ? -1 : 0;
 }
 
 void
