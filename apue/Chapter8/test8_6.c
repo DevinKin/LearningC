@@ -1,0 +1,20 @@
+/*************************************************************************
+    > File Name: test8_6.c
+    > Author: Elliot
+ ************************************************************************/
+#include "apue.h"
+
+int
+main(void)
+{
+	pid_t	pid;
+
+	if ((pid = fork()) < 0)
+		err_sys("fork error");
+	else if(pid == 0)
+		exit(0);
+
+	sleep(0);
+	system("ps ao pid,ppid,state,tty,command");
+	exit (0);
+}
