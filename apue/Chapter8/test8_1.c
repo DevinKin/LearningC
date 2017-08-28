@@ -27,7 +27,7 @@ main(void)
 		exit(0);
 
 	}
-	/*  parent continus here  */
+	/*  parent continue here  */
 	i = printf("pid = %ld, glob = %d, var = %d\n", (long)getpid(), globvar,
 			var);
 	sprintf(buf, "%d\n", i);
