@@ -14,6 +14,7 @@ pr_mask(const char *str)
 	sigset_t	sigset;
 	int			errno_save;
 
+
 	errno_save = errno;					/*  we can be called by signal handlers	 */
 	if (sigprocmask(0, NULL,  &sigset) < 0)
 		err_ret("sigprocmask error");
