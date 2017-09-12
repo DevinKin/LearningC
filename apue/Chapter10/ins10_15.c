@@ -10,13 +10,15 @@
 #include <time.h>
 #include <errno.h>
 
+
 static	void		sig_usr1(int);
 static	void		sig_alrm(int);
 static	sigjmp_buf	jmpbuf;
 static	volatile	sig_atomic_t	canjump;
 
 void
-pr_mask(const char *str);
+ptr_mask(const char *str);
+
 
 int
 main(void)
@@ -27,11 +29,11 @@ main(void)
 	if (signal(SIGALRM, sig_alrm) == SIG_ERR)
 		err_sys("signal(SIGALRM) error");
 
-	pr_mask("starting main: ");						/* Figure  10.14  */
+	ptr_mask("starting main: ");						/* Figure  10.14  */
 
 	if (sigsetjmp(jmpbuf, 1))
 	{
-		pr_mask("ending main:");
+		ptr_mask("ending main:");
 		exit(0);
 	}
 
@@ -48,7 +50,7 @@ sig_usr1(int signo)
 	if (canjump == 0)
 		return;
 
-	pr_mask("starting sig_usr1: ");
+	ptr_mask("starting sig_usr1: ");
 
 	alarm(3);							/*  SIGALRM in 3 seconds  */
 	starttime = time(NULL);				
@@ -56,7 +58,7 @@ sig_usr1(int signo)
 		if (time(NULL) > starttime + 5)
 			break;
 
-	pr_mask("finishing sig_usr1: ");
+	ptr_mask("finishing sig_usr1: ");
 
 	canjump = 0;
 
@@ -66,41 +68,73 @@ sig_usr1(int signo)
 static void
 sig_alrm(int signo)
 {
-	pr_mask("in sig_alrm: ");
+	ptr_mask("in sig_alrm: ");
 }
-
 
 
 void
-pr_mask(const char *str)
+ptr_mask(const char *ptr)//打印当前信号屏蔽字的屏蔽信号
 {
-	sigset_t	sigset;
-	int			errno_save;
+
+        sigset_t                sigset;
+
+        int                     errno_save;
+
+        int                     ret;
 
 
-	errno_save = errno;					/*  we can be called by signal handlers	 */
-	if (sigprocmask(0, NULL,  &sigset) < 0)
-		err_ret("sigprocmask error");
-	else
-	{
-		printf("%s", str);
-		if (sigismember(&sigset, SIGINT))
-			printf(" SIGINT");
 
-		if (sigismember(&sigset, SIGQUIT))
-			printf(" SIGQUIT");
+        errno_save = errno;
 
-		if (sigismember(&sigset, SIGUSR1))
-			printf(" SIGUSR1");
+        ret = sigprocmask(0, NULL, &sigset);
 
-		if (sigismember(&sigset, SIGALRM))
-			printf(" SIGALRM");
+        if(ret == -1){
 
-		/*  remaining signals can go here  */
-		printf("\n");
-	}
+                perror("sigprocmask error");
 
-	errno = errno_save;						/*  restore errno  */
+                exit(1);
+
+        }
+
+
+
+        printf("%s", ptr);
+
+
+
+        if(sigismember(&sigset, SIGINT)){
+
+                printf("SIGINT ");
+
+        }
+
+        if(sigismember(&sigset, SIGQUIT)){
+
+                printf("SIGQUIT ");
+
+        }
+
+        if(sigismember(&sigset, SIGUSR1)){
+
+                printf("SIGUSR1 ");
+
+        }
+
+        if(sigismember(&sigset, SIGALRM)){
+
+                printf("SIGALRM ");
+
+        }
+
+
+
+        printf("\n");
+
+        errno = errno_save;
+
 }
+
+
+
 
 
