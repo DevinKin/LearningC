@@ -11,7 +11,7 @@
 #include <sys/resource.h>
 
 void
-demonize(const char *cmd)
+daemonize(const char *cmd)
 {
 	int		i, fd0, fd1, fd2;
 	pid_t	pid;
@@ -89,10 +89,3 @@ demonize(const char *cmd)
 	}
 }
 
-int 
-main(void)
-{
-	demonize("ls");
-	pause();
-	return(0);
-}
