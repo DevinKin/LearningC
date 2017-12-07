@@ -1,13 +1,12 @@
 /*************************************************************************
-    > File Name: ins14_7.c
-    > Author: King
-    > Mail: arturiapendragon_1@163.com 
-    > Created Time: 2017年12月02日 星期六 22时03分08秒
- ************************************************************************/
+	> File Name: ins14_7.c
+	> Author: King
+	> Mail: arturiapendragon_1@163.com
+	> Created Time: 2017年12月02日 星期六 22时03分08秒
+************************************************************************/
 
 #include "apue.h"
 #include <fcntl.h>
-
 static void
 lockabyte(const char *name, int fd, off_t offset)
 {
@@ -36,18 +35,18 @@ int main(void)
 	if ((pid = fork()) < 0)
 		err_sys("fork error");
 	else if (pid == 0)			/* child */
-	{
-		lockabyte("child", fd, 0);
-		TELL_PARENT(getppid());
-		WAIT_PARENT();
-		lockabyte("child", fd, 1);
-	}
+		{
+			lockabyte("child", fd, 0);
+			TELL_PARENT(getppid());
+			WAIT_PARENT();
+			lockabyte("child", fd, 1);
+		}
 	else
-	{
-		lockabyte("parent", fd, 1);
-		TELL_CHILD(pid);
-		WAIT_CHILD();
-		lockabyte("parent", fd, 0);
-	}
+		{
+			lockabyte("parent", fd, 1);
+			TELL_CHILD(pid);
+			WAIT_CHILD();
+			lockabyte("parent", fd, 0);
+		}
 	exit(0);
 }
